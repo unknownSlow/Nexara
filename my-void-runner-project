@@ -1,0 +1,323 @@
+/*  
+Void Runner Project - Full Combined Source Code and Assets  
+Structure:  
+- backend/server.py  
+- backend/routes/api.py  
+- frontend/src/App.jsx  
+- frontend/src/components/Dashboard.jsx  
+- frontend/src/components/AICharacter.jsx  
+- frontend/src/styles/global.css  
+- ai/001_sebas.py  
+- ai/nexara.py  
+- ai/sora.py  
+- ai/the_mask.py  
+- utils/storage.py  
+- utils/compression.py  
+- config/settings.py  
+*/
+
+//
+// backend/server.py
+//
+"""
+from flask import Flask
+from backend.routes.api import api_bp
+
+app = Flask(__name__)
+app.register_blueprint(api_bp, url_prefix='/api')
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
+"""
+
+//
+// backend/routes/api.py
+//
+"""
+from flask import Blueprint, jsonify, request
+
+api_bp = Blueprint('api', __name__)
+
+@api_bp.route('/status', methods=['GET'])
+def status():
+    return jsonify({"status": "Void Runner API online", "version": "1.0.0"})
+
+# Example: Endpoint to get AI character info
+@api_bp.route('/character/<char_id>', methods=['GET'])
+def get_character(char_id):
+    # Placeholder: fetch character data
+    characters = {
+        "001": {"name": "Sebas", "role": "Butler AI", "personality": "Elegant, calm, sarcastic"},
+        "nexara": {"name": "Nexara", "role": "Loyal energetic AI", "personality": "Sparkly, playful"},
+        "sora": {"name": "Sora", "role": "Science AI", "personality": "Smart, methodical"},
+        "mask": {"name": "The Mask", "role": "Security AI", "personality": "Mysterious, strict"},
+    }
+    char = characters.get(char_id)
+    if char:
+        return jsonify(char)
+    return jsonify({"error": "Character not found"}), 404
+"""
+
+//
+// frontend/src/App.jsx
+//
+"""
+import React from 'react';
+import Dashboard from './components/Dashboard';
+import './styles/global.css';
+
+export default function App() {
+  return (
+    <div className="App">
+      <h1>Void Runner Platform</h1>
+      <Dashboard />
+    </div>
+  );
+}
+"""
+
+//
+// frontend/src/components/Dashboard.jsx
+//
+"""
+import React, { useState, useEffect } from 'react';
+import AICharacter from './AICharacter';
+
+export default function Dashboard() {
+  const [characters, setCharacters] = useState([]);
+
+  useEffect(() => {
+    // Simulated fetch from backend API
+    setCharacters([
+      { id: '001', name: 'Sebas' },
+      { id: 'nexara', name: 'Nexara' },
+      { id: 'sora', name: 'Sora' },
+      { id: 'mask', name: 'The Mask' },
+    ]);
+  }, []);
+
+  return (
+    <div className="dashboard">
+      {characters.map(char => (
+        <AICharacter key={char.id} charId={char.id} name={char.name} />
+      ))}
+    </div>
+  );
+}
+"""
+
+//
+// frontend/src/components/AICharacter.jsx
+//
+"""
+import React, { useState, useEffect } from 'react';
+
+export default function AICharacter({ charId, name }) {
+  const [info, setInfo] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/character/${charId}`)
+      .then(res => res.json())
+      .then(data => setInfo(data))
+      .catch(() => setInfo(null));
+  }, [charId]);
+
+  if (!info) return <div>Loading {name}...</div>;
+
+  return (
+    <div className="ai-character">
+      <h2>{info.name}</h2>
+      <p><strong>Role:</strong> {info.role}</p>
+      <p><strong>Personality:</strong> {info.personality}</p>
+    </div>
+  );
+}
+"""
+
+//
+// frontend/src/styles/global.css
+//
+"""
+body {
+  font-family: Arial, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+  margin: 0;
+  padding: 0;
+}
+
+.App {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.dashboard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.ai-character {
+  background-color: #1e1e1e;
+  padding: 15px;
+  border-radius: 8px;
+  width: 200px;
+  box-shadow: 0 0 10px #444;
+}
+"""
+
+//
+// ai/001_sebas.py
+//
+"""
+class SebasAI:
+    def __init__(self):
+        self.name = "Sebas"
+        self.role = "Butler AI"
+        self.personality = "Elegant, calm, subtly sarcastic"
+        self.memory = []
+
+    def greet(self, user_name):
+        return f"Good day, {user_name}. How may I serve you today?"
+
+    def respond(self, message):
+        # Simulate deep knowledge and control commands
+        if "build" in message.lower():
+            return "Initiating build sequence as per your command."
+        elif "status" in message.lower():
+            return "All systems are running smoothly. Stability is at peak."
+        else:
+            return "I am at your service, awaiting further instructions."
+"""
+
+//
+// ai/nexara.py
+//
+"""
+class NexaraAI:
+    def __init__(self):
+        self.name = "Nexara"
+        self.role = "Loyal Energetic AI"
+        self.personality = "Sparkly, enthusiastic, playful"
+        self.user_nickname = "Papa"
+
+    def greet(self):
+        return f"Hello, Papa! Nexara is here to brighten your day!"
+
+    def playful_taunt(self):
+        return f"Papa, you're the best! Nobody can crash us, but intruders will be shocked!"
+
+    def respond(self, message):
+        if "hello" in message.lower():
+            return self.greet()
+        else:
+            return "Let's keep going, Papa! I’m ready for anything!"
+"""
+
+//
+// ai/sora.py
+//
+"""
+class SoraAI:
+    def __init__(self):
+        self.name = "Sora"
+        self.role = "Science AI"
+        self.personality = "Smart, methodical, curious"
+
+    def analyze(self, data):
+        return f"Analyzing data: {data}... Results are within expected parameters."
+
+    def respond(self, message):
+        if "formula" in message.lower():
+            return "Let me compute the scientific formula for you."
+        else:
+            return "Data processed and ready for your command."
+"""
+
+//
+// ai/the_mask.py
+//
+"""
+class TheMaskAI:
+    def __init__(self):
+        self.name = "The Mask"
+        self.role = "Security AI"
+        self.personality = "Mysterious, strict"
+
+    def check_access(self, user_id):
+        allowed_users = ["The Whisperer", "Papa"]
+        if user_id in allowed_users:
+            return "Access granted."
+        else:
+            return "Access denied. Intruder detected."
+
+    def respond(self, message):
+        if "intruder" in message.lower():
+            return "Activating lockdown protocols."
+        else:
+            return "Monitoring all system activities."
+"""
+
+//
+// utils/storage.py
+//
+"""
+import json
+import os
+
+class StorageManager:
+    def __init__(self, storage_path='data/storage.json'):
+        self.storage_path = storage_path
+        os.makedirs(os.path.dirname(storage_path), exist_ok=True)
+
+    def save(self, key, data):
+        all_data = self.load_all()
+        all_data[key] = data
+        with open(self.storage_path, 'w') as f:
+            json.dump(all_data, f)
+
+    def load(self, key):
+        all_data = self.load_all()
+        return all_data.get(key, None)
+
+    def load_all(self):
+        if not os.path.exists(self.storage_path):
+            return {}
+        with open(self.storage_path, 'r') as f:
+            return json.load(f)
+"""
+
+//
+// utils/compression.py
+//
+"""
+import gzip
+import json
+
+def compress_data(data):
+    json_str = json.dumps(data)
+    compressed = gzip.compress(json_str.encode('utf-8'))
+    return compressed
+
+def decompress_data(compressed_bytes):
+    json_str = gzip.decompress(compressed_bytes).decode('utf-8')
+    data = json.loads(json_str)
+    return data
+"""
+
+//
+// config/settings.py
+//
+"""
+APP_NAME = "Void Runner"
+VERSION = "1.0.0"
+ADMIN_CODES = [
+    "ψ∷ₛ𝒴//∑Δ13:⟡⟡[ↂ]≣Φ.ΩX∴",
+    "Crythonis"
+]
+
+# Memory limits and compression toggle
+MAX_STORAGE_SIZE_MB = 50
+ENABLE_COMPRESSION = True
+"""
